@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  connection: local
+  tasks:
+   - name: Add group "tempgroup"
+     group:
+       name: tempgroup
+       gid: 2010
+       state: present
+
+   - name: Remove group again
+     group:
+       name: tempgroup
+       state: absent
