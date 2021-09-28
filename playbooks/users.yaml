@@ -3,7 +3,6 @@
   become: yes
   become_method: sudo
   gather_facts: no
-  connection: local
   tasks:
    - name: Add group "tempgroup"
      group:
