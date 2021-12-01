@@ -9,6 +9,6 @@
     #tower_config_file: "{{ automation_controller_cli_config }}"
     tower_host: 10.211.55.22
     tower_username: linuxadm
-    tower_oauthtoken: linuxadm
+    tower_password: linuxadm
   loop: "{{ controller_objects.organisations | subelements('inventories', 'skip_missing=True') }}"
 ...
