@@ -1,0 +1,10 @@
+---
+# Create Organization object in Automation Controller
+- name: "Create organizations"
+  tower_organization:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    state: present
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations }}"
+...

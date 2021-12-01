@@ -1,0 +1,24 @@
+# Proxy Settings for Automation Controller
+#
+# MUST look like the following:
+#
+# env_proxy_http: '"http_proxy": "http://user:pass@127.0.0.1:1234"'
+# env_proxy_https: '"https_proxy": "https://user:pass@127.0.0.1:1234"'
+# env_proxy_noproxy: '"internal.local"'
+
+env_proxy_http: ''
+env_proxy_https: ''
+env_proxy_noproxy: ''
+
+# Basic Configuration which should be imported
+controller_objects:
+
+  # Create an example organization
+  organisations:
+    - name: "Example Organization"
+      description: "This is the Example Department"
+
+      # Create an example inventory
+      inventories:
+        - name: "Example Inventory"
+          description: "This is an example inventory"

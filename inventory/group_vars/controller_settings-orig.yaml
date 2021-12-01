@@ -1,0 +1,107 @@
+# Proxy Settings for Automation Controller
+#
+# MUST look like the following:
+#
+# env_proxy_http: '"http_proxy": "http://user:pass@127.0.0.1:1234"'
+# env_proxy_https: '"https_proxy": "https://user:pass@127.0.0.1:1234"'
+# env_proxy_noproxy: '"internal.local"'
+
+env_proxy_http: ''
+env_proxy_https: ''
+env_proxy_noproxy: ''
+
+# Basic Configuration which should be imported
+controller_objects:
+
+  # Create an example organization
+  organisations:
+    - name: "Example Organization"
+      description: "This is the Example Department"
+      
+      # Create the following teams in that organization
+      teams:
+        - name: "Networking Team"
+        - name: "Windows Team"
+        - name: "Linux Team"
+
+      # Create users, using password stored in vaults 
+      users:
+        - user_name: "firstuser"
+          first_name: "First"
+          last_name: "User"
+          pass: "initialpassword"
+          email: "first@user.com"
+          superuser: yes # This is a superuser 
+          state: present
+          role_org: admin 
+
+        - user_name: "seconduser"
+          first_name: "Second"
+          last_name: "User"
+          pass: "initialpassword"
+          email: "second@user.com"
+          state: present
+          role_org: member
+
+      # Create some example credentials, be sure to store the secrets in a vault
+      credentials:
+        - name: "GIT Key"
+          description: "Git User to pull repository"
+          kind: scm
+          secrets: "{{ lookup('file', '../vaults/towercred_scm_credentials.yaml') | from_yaml }}"
+
+        - name: "SSH Machines"
+          organization: "Example Department"
+          description: "SSH credentials to login"
+          kind: ssh
+          become_method: sudo
+          secrets: "{{ lookup('file', '../vaults/towercred_ssh-access.yaml') | from_yaml }}"
+
+        - name: "Public GIT"
+          description: "Public GIT Repo"
+          kind: scm
+    
+      # Create an example project, here the "scm_credentials" is the name of organization.credentials.name In this example "Public GIT" (see above)
+      # The example code at https://github.com/tjungbauer/example_playbook is used. 
+      projects:
+        - name: "Example Project"
+          description: "This is an example projects"
+          scm_url: "https://github.com/tjungbauer/example_playbook"
+          scm_type: git
+          scm_update_on_launch: "yes"
+          scm_credential: "Public GIT"
+
+      # Create an example inventory
+      inventories:
+        - name: "Example Inventory"
+          description: "This is an example inventory"
+
+      # Create an example inventory source, using SCM. "source_project" is the name of organization.project.name (see above)
+      inventory_source:
+        - name: "Example Inventory Source"
+          inventory: "Example Inventory"
+          source: scm
+          source_project: "Example Project"
+          source_path: inventory/hosts
+          update_on_launch: true
+          overwrite: true
+          overwrite_vars: true
+
+      # Create an example Job. The keys "project", "inventory" and "credentials" are the names of the previously defined objects (see above)
+      job_templates:   
+        - name: "Example Job"
+          description: "This is an example Job"
+          job_type: "run"
+          playbook: "example_playbook.yaml"
+          project: "Example Project"
+          inventory: "Example Inventory"
+          credential: "SSH Machines"
+
+      # Create an example Workflow. The keys "organization" is the name of the organization we are assinging the Workflow
+      # The actual login of the Workflow is defined under workflows/wf_example.yaml
+      workflow_templates:
+        - name: "Example Workflow"
+          description: "This is an example Workflow"
+          organization: "Example Department"
+          schema: "{{ lookup('file', '../workflows/wf_example.yaml') }}"
+          allow_simultaneous: true

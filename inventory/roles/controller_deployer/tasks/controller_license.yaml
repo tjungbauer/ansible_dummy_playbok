@@ -1,0 +1,28 @@
+---
+# Apply the Automation Controller License
+- name: "FACT - defaultChannel (nolog enabled)"
+  no_log: true
+  set_fact:
+    b64manifest: "{{ lookup('file', '{{ automation_controller_manifest_zip }}' ) | b64encode}}"
+
+- name: "[Controller] Apply Subscription to Ansible Controller"
+  no_log: true
+  uri:
+    url: "{{ automation_controller_local_url }}/api/v2/config/"
+    validate_certs: false
+    method: POST
+    force_basic_auth: true
+    user: "{{ automation_controller_admin_username }}"
+    password: "{{ automation_controller_admin_password }}"
+    body: '{ "eula_accepted": "true","manifest": "{{ b64manifest }}" }'
+    body_format: json
+    status_code: 200,201
+    headers:
+      Content-Type: "application/json"
+    return_content: yes
+  register: result
+
+- name: "[DEBUG] License applied"
+  debug:
+    msg: "{{ result }}"
+...

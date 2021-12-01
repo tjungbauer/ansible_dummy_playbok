@@ -1,0 +1,18 @@
+---
+# Creating Workflow Templates based on template files
+- name: " Create Workflow Templates"
+  tower_workflow_template:
+    name: "{{ item.1.name }}"
+    description: "{{ item.1.description }}"
+    organization: "{{ item.0.name }}"
+    schema: "{{ item.1.schema }}"
+    survey: "{{ item.1.survey | default(omit)  }}"
+    survey_enabled: "{{ item.1.survey_enabled | default(omit)  }}"
+    extra_vars: "{{ item.1.extra_vars | default(omit)  }}"
+    ask_extra_vars: "{{ item.1.ask_extra_vars | default(omit)  }}"
+    ask_inventory: "{{ item.1.ask_inventory | default(omit)  }}"
+    allow_simultaneous: "{{ item.1.allow_simultaneous | default(omit)  }}"
+    state: "{{ tower_manage_proj_state | default('present') }}"
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations | subelements('workflow_templates', 'skip_missing=True') }}"
+...

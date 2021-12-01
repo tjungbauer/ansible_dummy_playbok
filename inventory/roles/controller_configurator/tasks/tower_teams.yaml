@@ -1,0 +1,11 @@
+---
+# Create Teams Object in Automation Controller
+- name: "Create Teams"
+  tower_team:
+    name: "{{ item.1.name }}"
+    description: "{{ item.1.description | default(omit) }}"
+    organization: "{{ item.0.name }}"
+    state: present
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations | subelements ('teams', 'skip_missing=True') }}"
+...

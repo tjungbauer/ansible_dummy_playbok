@@ -1,0 +1,14 @@
+---
+# Create Users Objects in Automation Controller
+- name: Add Users
+  tower_user:
+    first_name: "{{ item.1.first_name }}"
+    last_name: "{{ item.1.last_name }}"
+    username: "{{ item.1.user_name }}"
+    password: "{{ item.1.pass }}"
+    email: "{{ item.1.email }}"
+    superuser: "{{ item.1.superuser | default(omit) }}"
+    state: "{{ item.1.state }}"
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations | subelements ('users', 'skip_missing=True') }}"
+...

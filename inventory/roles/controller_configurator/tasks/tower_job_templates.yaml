@@ -1,0 +1,27 @@
+---
+# Create Job Templates
+- name: " Create Job Templates"
+  tower_job_template:
+    name: "{{ item.1.name }}"
+    job_type: "{{ item.1.job_type }}"
+    playbook: "{{ item.1.playbook }}"
+    project: "{{ item.1.project }}"
+    inventory: "{{ item.1.inventory }}"
+    state: "{{ tower_manage_proj_state | default('present') }}"
+    ask_credential: "{{ item.1.ask_credential | default(omit)  }}"
+    ask_extra_vars: "{{ item.1.ask_extra_vars | default(omit)  }}"
+    extra_vars_path: "{{ item.1.extra_vars_path | default(omit)  }}"
+    ask_tags: "{{ item.1.ask_tags | default(omit)  }}"
+    ask_skip_tags: "{{ item.1.ask_skip_tags | default(omit)  }}"
+    verbosity: "{{ item.1.verbosity | default(omit)  }}"
+    become_enabled: "{{ item.1.become_enabled | default(omit)  }}"
+    credential: "{{ item.1.credential  }}"
+    survey_enabled: "{{ item.1.survey_enabled | default(omit)  }}"
+    survey_spec: "{{ item.1.survey_spec | default(omit)  }}"
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations | subelements('job_templates', 'skip_missing=True') }}"
+  register: result
+  until: result.changed == true
+  retries: 50
+  delay: 10
+...

@@ -1,0 +1,114 @@
+---
+# Assert Automation Controller version specified
+- name: "Assert Automation Controller version specified"
+  assert:
+    that:
+      - automation_controller_release_version is defined
+    fail_msg: "automation_controller_release_version must be defined"
+
+- name: "Assert Automation Controller Manifest is defined"
+  assert:
+    that:
+      - automation_controller_manifest_zip is defined
+    fail_msg: "automation_controller_manifest_zip must be defined"
+
+- name: Check that the {{ automation_controller_manifest_zip }} exists
+  stat:
+    path: "{{ automation_controller_manifest_zip }}"
+  register: stat_result
+
+- name: "[DEBUG] Please download and put the manifest.zip file to {{ automation_controller_manifest_zip }}"
+  debug: 
+    msg: "Please download and put the manifest.zip file to {{ automation_controller_manifest_zip }}"
+  when: not stat_result.stat.exists
+  failed_when:
+    - stat_result.stat.exists == 0
+
+- name: Check if Ansible Automation Controller is running.
+  uri:
+    url: "{{ automation_controller_local_url }}"
+    status_code: 200
+    validate_certs: False
+  register: result
+  until: result.status == 200
+  retries: 3
+  delay: 10
+  ignore_errors: True
+
+- name: BLOCK - Download and Install Ansible Controller
+  block:
+  # Install Base OS Packages
+  - name: "Install Base Packages for Automation Controller CLI"
+    yum:
+      name: "{{ automation_controller_base_packages }}"
+      state: present
+    when: ansible_facts['distribution'] == "CentOS"
+
+  # Same, but on RHEL RHSCL is enabled by Automation Controller, so disable
+  - name: "Install Base Packages for Automation Controller CLI"
+    yum:
+      name: "{{ automation_controller_base_packages }}"
+      state: present
+      disablerepo: "{{ item }}"
+    ignore_errors: yes
+    loop: "{{ automation_controller_disablerepo }}"
+    when: ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version']|int >= 7
+
+  # Download and Extract
+  - name: "[Controller] Download and Extract Automation Controller"
+    unarchive:
+      src: "{{ automation_controller_releases_url }}/ansible-tower-setup-{{ automation_controller_release_version }}.tar.gz"
+      dest: "{{ automation_controller_working_location }}"
+      remote_src: true
+      exclude: "inventory"
+    register: tower_download_extract
+
+  # Create Inventory
+  - name: "[Controller] Populate Automation Controller Setup Inventory from Template"
+    template:
+      src: inventory.j2
+      dest: "{{ automation_controller_working_location }}/ansible-tower-setup-{{ automation_controller_release_version }}/inventory"
+      mode: 0400
+      group: root
+      owner: root
+
+  # Run the Setup
+  - name: "[Controller] Run the Ansible Automation Controller Setup Program - This will take a while, play Dungeons and Dragons in the meantime, Faerûn is waiting"
+    command: ./setup.sh "{{ automation_controller_extra_vars | join(' ') }}"
+    args:
+      chdir: "{{ automation_controller_working_location }}/ansible-tower-setup-{{ automation_controller_release_version }}"
+    async: 10000
+    poll: 0
+    register: controller_setup_status
+    changed_when: false   # these will always run and will always report “changed” otherwise
+    loop: "{{ automation_controller_extra_vars }}"
+
+  - name: Check if Ansible Automation Controller has been deployed
+    async_status:
+      jid: "{{ controller_setup_result_item.ansible_job_id }}"
+    loop: "{{ controller_setup_status.results }}"
+    loop_control:
+      loop_var: "controller_setup_result_item"
+    register: job_result
+    until: job_result.finished
+    poll: 20
+    retries: 3000
+
+  # Pregnant Pause
+  - name: "Long Rest to Recover ... for 30 seconds"
+    pause:
+      seconds: 30
+
+  - name: Check if Ansible Automation Controller is running.
+    uri:
+      url: "{{ automation_controller_local_url }}"
+      status_code: 200
+      validate_certs: false
+    register: result_install
+    until: result_install.status == 200
+    retries: 90
+    delay: 10
+
+  # Block when statement ... if Controller is not yet running
+  when: >
+    result.status != 200

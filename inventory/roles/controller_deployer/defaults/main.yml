@@ -1,0 +1,49 @@
+---
+
+# defaults file for controller_deployer
+
+############################################################
+#       Automation Controller Installation Vars            #
+############################################################
+
+# extra variables (list)
+automation_controller_extra_vars: []
+
+# Working location for installation files
+automation_controller_working_location: "/root/"
+
+# Default Admin Username
+automation_controller_admin_username: admin
+
+# Default Password used for Automation Controller deployment
+automation_controller_admin_password: "password"
+automation_controller_pg_password: "password"
+automation_controller_hub_admin_password: "password"
+automation_controller_hub_pg_password: "password"
+
+# Automation Controller Installer
+automation_controller_releases_url: https://releases.ansible.com/ansible-tower/setup
+automation_controller_release_version: 3.8.3-1
+
+############################################################
+#               Ansible  initial settings.                 #
+############################################################
+
+automation_controller_hosts:
+    - "localhost ansible_connection=local"
+
+automation_controller_db_host: "localhost"
+automation_controller_db_port: "5432"
+automation_controller_hub_host: ""
+automation_controller_hub_pg_host_port: "5432"
+
+
+
+# just to check if it is running ... localhost is fine here
+automation_controller_local_url: https://localhost
+automation_controller_validate_certs: true
+
+automation_controller_cli_config: "~/.tower_cli.cfg"
+automation_controller_manifest_zip: "/tmp/manifest.zip"
+
+...

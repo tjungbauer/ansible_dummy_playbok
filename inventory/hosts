@@ -1,0 +1,6 @@
+[tower]
+localhost
+
+# only use, when python interpreter is not found ... python 3 required.
+#[tower:vars]
+#ansible_python_interpreter=/usr/bin/python3

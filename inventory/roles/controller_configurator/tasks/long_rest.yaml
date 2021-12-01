@@ -1,0 +1,3 @@
+- name: "Out of Mana - Long Rest"
+  pause:
+    seconds: 30

@@ -1,0 +1,18 @@
+---
+# Create a Project object in Automation Controller 
+- name: "Add Tower Project with cache timeout"
+  tower_project:
+    name: "{{ item.1.name }}"
+    description: "{{ item.1.description | default(omit) }}"
+    organization: "{{ item.0.name }}"
+    scm_url: "{{ item.1.scm_url }}"
+    scm_type: "{{ item.1.scm_type }}"
+    scm_update_on_launch: "{{ item.1.scm_update_on_launch | default(omit) }}"
+    scm_update_cache_timeout: 60
+    scm_credential: "{{ item.1.scm_credential | default(omit) }}"
+    scm_branch: "{{ item.1.scm_branch | default('main') }}"
+    state: "{{ tower_manage_proj_state | default('present') }}"
+    custom_virtualenv: "{{ item.1.custom_virtualenv | default(omit) }}"
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations | subelements('projects' , 'skip_missing=True')  }}"
+...

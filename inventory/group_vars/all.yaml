@@ -1,0 +1,45 @@
+# OS Proxy Settings, required if system must talk to a proxy to reach the internet. 
+# Used by these Ansible Playbooks
+system_proxy_env:
+  http_proxy: http://127.0.0.1:8080
+  https_proxy: https://127.0.0.1:8080
+
+
+# Do NOT user "latest", since the extracted directory will have the version number, and ansible cannot find it later, once it has been extracted
+automation_controller_release_version: 3.8.3-1
+
+# Define the working directory where the setup will be executed
+automation_controller_working_location: "/root"
+
+# Define list of Ansible Tower nodes. For HA 3 should be defined at least.
+# The installation playbooks are executed on 10.211.55.22, therefore connection is set to local.
+automation_controller_hosts:
+  - "10.211.55.22 ansible_connection=local"
+
+# Host for Tower database
+automation_controller_db_host: "10.211.55.24"
+
+# Host for Automation Hub, MUST NOT be the same IP as Ansible Tower node
+automation_controller_hub_host: "10.211.55.23"
+
+# Host for Automation Hub database, can be the same like Tower database
+automation_controller_hub_pg_host: "10.211.55.24"
+
+
+# Default Passwords for UI and database used for Automation Controller deployment. All variables are defined in the vault "vaults/construct-siege-tower.vault"
+automation_controller_admin_password: "{{ controller_admin_password }}"
+automation_controller_pg_password: "{{ controller_pg_password }}"
+automation_controller_hub_admin_password: "{{ controller_hub_admin_password }}"
+automation_controller_hub_pg_password: "{{ controller_hub_pg_password }}"
+automation_controller_validate_certs: false
+
+# extra vars ... for example 'ignore_preflight_errors=true' for test installations
+automation_controller_extra_vars:
+    - ''
+#    - '-e ignore_preflight_errors=true'
+
+# to connect and authenticate to a running Automation Controller
+automation_controller_cli_config: "~/.tower_cli.cfg"
+
+# Path to the maifest.zip file, which was downloaded from Red Hat
+automation_controller_manifest_zip: "/tmp/manifest.zip"

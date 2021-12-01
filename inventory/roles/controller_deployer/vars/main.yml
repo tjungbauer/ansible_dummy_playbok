@@ -1,0 +1,9 @@
+---
+
+# Base Packages
+automation_controller_base_packages:
+    - python38-devel
+    - gcc
+
+automation_controller_disablerepo:
+    - "rhel-server-rhscl-7-rpms"

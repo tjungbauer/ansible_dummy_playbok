@@ -1,0 +1,27 @@
+---
+- name: Push Tower Configuration, be magical, be a unicorn
+  hosts: tower
+  gather_facts: False
+  connection: local
+  vars_files:
+    - ../vaults/construct-siege-tower.vault
+    - ../inventory/group_vars/controller_settings.yaml
+
+  #environment: "{{ system_proxy_env }}"
+
+  # re-use AWX collection
+  collections:
+  - awx.awx
+
+  tasks:
+
+  - include_role:
+      name: controller_configurator
+      tasks_from: "{{ controller_building_steps }}.yaml"
+    loop:      # Include  specific task file
+      - tower_inventories
+      - tower_inventory_sources
+    loop_control:
+      loop_var: controller_building_steps
+
+...

@@ -1,0 +1,53 @@
+---
+
+- name: "Check if tower-cli configuration files already exists"
+  stat:
+    path: "{{ automation_controller_cli_config }}"
+  register: tower_cli_stat_result
+
+- name: BLOCK - Create Access Token and set tower-cli configuration file
+  block:
+  - name: "[Controller] GetAcces Token for Admin user"
+    uri:
+      url: "{{ automation_controller_local_url }}/api/v2/tokens/"
+      validate_certs: false
+      method: GET
+      force_basic_auth: true
+      user: "{{ automation_controller_admin_username }}"
+      password: "{{ automation_controller_admin_password }}"
+      status_code: 200
+      headers:
+        Content-Type: "application/json"
+      return_content: yes
+    register: result_get_token
+
+  - debug:
+      msg: "It seems there exists already an access token"
+    when: 'result_get_token.json.count >= 1'
+
+  # Apply the Automation Controller License
+  - name: "[Controller] Create Access Token for Admin user"
+    uri:
+      url: "{{ automation_controller_local_url }}/api/v2/tokens/"
+      validate_certs: false
+      method: POST
+      force_basic_auth: true
+      user: "{{ automation_controller_admin_username }}"
+      password: "{{ automation_controller_admin_password }}"
+      body: '{ "description": "API Access Token","scope": "write" }'
+      body_format: json
+      status_code: 200,201
+      headers:
+        Content-Type: "application/json"
+      return_content: yes
+    register: result
+
+  # Create tower-cli configuration
+  - name: "Create tower-cli configuration"
+    template:
+      src: tower-cli.j2
+      dest: "{{ automation_controller_cli_config }}"
+      mode: 0400
+
+  when: not tower_cli_stat_result.stat.exists
+...

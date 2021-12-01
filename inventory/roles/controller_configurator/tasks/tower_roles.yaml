@@ -1,0 +1,11 @@
+---
+# Create Roles to Users in Automation Controller
+- name: Add Role
+  tower_role:
+    user: "{{ item.1.user_name }}"
+    organization: "{{ item.0.name }}"
+    role: "{{ item.1.role_org }}"
+    state: "{{ item.1.state | default(present) }}"
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations | subelements ('users', 'skip_missing=True') }}"
+...

@@ -1,0 +1,11 @@
+---
+# Create a Inventory object in Automation Controller 
+- name: " Create Inventories"
+  tower_inventory:
+    name: "{{ item.1.name }}"
+    description: "{{ item.1.description }}"
+    organization: "{{ item.0.name }}"
+    state: "{{ tower_manage_proj_state | default('present') }}"
+    tower_config_file: "{{ automation_controller_cli_config }}"
+  loop: "{{ controller_objects.organisations | subelements('inventories', 'skip_missing=True') }}"
+...
