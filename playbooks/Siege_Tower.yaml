@@ -2,7 +2,11 @@
 - name: Push Tower Configuration, be magical, be a unicorn
   hosts: tower
   gather_facts: False
+  become: true
+  become_method: sudo
+  become_user: root
   connection: local
+  ansible_connection: local
   vars_files:
     - ../vaults/construct-siege-tower.vault
     - ../inventory/group_vars/controller_settings.yaml
