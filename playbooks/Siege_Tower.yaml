@@ -1,6 +1,6 @@
 ---
 - name: Push Tower Configuration, be magical, be a unicorn
-  hosts: tower
+  hosts: 10.211.55.22
   gather_facts: False
   #connection: local
   vars_files:
