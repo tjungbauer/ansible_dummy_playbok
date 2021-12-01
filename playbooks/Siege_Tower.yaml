@@ -1,8 +1,9 @@
 ---
 - name: Push Tower Configuration, be magical, be a unicorn
-  hosts: all
+  hosts: tower
   gather_facts: False
-  #connection: local
+  connection: local
+  become: false
   vars_files:
     - ../vaults/construct-siege-tower.vault
     - ../inventory/group_vars/controller_settings.yaml

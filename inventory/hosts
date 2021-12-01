@@ -1,6 +1,5 @@
 [tower]
-10.211.55.22
-#localhost ansible_connection=local
+localhost ansible_connection=local
 
 # only use, when python interpreter is not found ... python 3 required.
 #[tower:vars]
