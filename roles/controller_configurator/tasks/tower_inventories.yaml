@@ -10,5 +10,6 @@
     tower_host: 10.211.55.22
     tower_username: linuxadm
     tower_password: linuxadm
+    validate_certs: no
   loop: "{{ controller_objects.organisations | subelements('inventories', 'skip_missing=True') }}"
 ...
