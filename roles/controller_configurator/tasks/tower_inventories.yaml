@@ -6,6 +6,9 @@
     description: "{{ item.1.description }}"
     organization: "{{ item.0.name }}"
     state: "{{ tower_manage_proj_state | default('present') }}"
-    tower_config_file: "{{ automation_controller_cli_config }}"
+    #tower_config_file: "{{ automation_controller_cli_config }}"
+    tower_host: 10.211.55.22
+    tower_username: linuxadm
+    tower_oauthtoken: linuxadm
   loop: "{{ controller_objects.organisations | subelements('inventories', 'skip_missing=True') }}"
 ...
